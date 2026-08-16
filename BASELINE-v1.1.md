@@ -68,12 +68,12 @@ que formalizou, avaliou, aprovou e testou aquela mesma alteração pelo caminho 
 | Aplicação       | Node.js 22; Express 5.1; Porta 3000      | Inalterado               |
 | Banco de Dados  | MySQL 9.0; Banco: pedidos; Porta 3306    | Alterado (8.4 → 9.0)     |
 | Infraestrutura  | Ubuntu Server 24.04; 4 GB RAM; 2 vCPUs   | Inalterado               |
-| Código          | Branch: main; Commit: def456             | Alterado (abc123 → def456) |
+| Código          | Branch: main; Commit: abc123             | Inalterado               |
 
-Resumo da mudança: dos cinco ICs da baseline, dois foram alterados por decorrência direta
-da RFC-001 (Banco de Dados e Código), um foi incrementado como consequência formal do novo
-estado aprovado (Sistema) e dois permaneceram idênticos à v1.0 (Aplicação e
-Infraestrutura).
+Resumo da mudança: dos cinco ICs da baseline, um foi alterado por decorrência direta da
+RFC-001 (Banco de Dados), um foi incrementado como consequência formal do novo estado
+aprovado (Sistema) e três permaneceram idênticos à v1.0 (Aplicação, Infraestrutura e
+Código).
 
 ### 4.1. Por que cada item é um IC crítico
 
@@ -95,10 +95,12 @@ superfície da mudança a um único fator.
 mantida deliberadamente. Alterar hardware e banco na mesma janela impediria isolar a causa
 de uma eventual variação de desempenho.
 
-**Código — branch main, commit def456.** Garante a reprodutibilidade do comportamento
-funcional. O novo commit contém o ajuste do driver MySQL e das consultas afetadas pelos
-recursos depreciados no 9.0 — ou seja, o código precisou acompanhar a mudança de banco
-para que o sistema voltasse a operar corretamente.
+**Código — branch main, commit abc123.** Garante a reprodutibilidade do comportamento
+funcional. O commit permanece o mesmo aprovado na v1.0: a RFC-001 autorizou exclusivamente
+a mudança do motor de banco, e os erros observados durante a alteração não autorizada de
+15/08 foram resolvidos por parâmetros de configuração do próprio MySQL 9.0, sem necessidade
+de alterar o código. Manter o commit inalterado é o que permite afirmar que qualquer
+diferença de comportamento entre a v1.0 e a v1.1 vem do banco, e não da aplicação.
 
 ## 5. Critérios de validação que embasaram a aprovação
 
@@ -117,8 +119,8 @@ Execução da suíte de testes de integração da aplicação contra o MySQL 9.0
 incluindo especificamente as consultas que haviam apresentado erro durante a alteração não
 autorizada de 15/08.
 
-Execução da suíte de regressão completa, garantindo que o ajuste feito nas consultas não
-introduziu efeito colateral em outras funcionalidades.
+Execução da suíte de regressão completa, garantindo que os parâmetros ajustados no novo
+motor não introduziram efeito colateral em outras funcionalidades.
 
 Verificação de que a aplicação continua inicializando corretamente na porta 3000 sob
 Node.js 22 / Express 5.1 e conectando ao banco na porta 3306.
@@ -127,8 +129,9 @@ Comparação das métricas de desempenho das consultas críticas antes e depois 
 confirmando a melhoria que motivou a RFC-001 — critério sem o qual a mudança teria sido
 revertida, ainda que funcionasse.
 
-Confirmação de que o commit def456 na branch main corresponde exatamente ao artefato
-testado, sem qualquer alteração posterior não commitada.
+Confirmação de que o commit abc123 na branch main permanece sendo exatamente o artefato em
+execução, sem qualquer alteração posterior não commitada — o código não foi tocado durante
+esta mudança.
 
 ## 6. Escopo e governança
 
